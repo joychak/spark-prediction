@@ -13,7 +13,7 @@ object CSVUtils {
       .format("csv")
       .option("header", "true")
       //.option("inferSchema", "true")
-      .option("parserLib", "UNIVOCITY") // <-- This is the configuration that solved the issue.
+      .option("parserLib", "UNIVOCITY")
       .load(path)
 
     data.registerTempTable(tableName)
