@@ -83,7 +83,7 @@ object Main {
     println(model + " Area under ROC = " + aucROC)
     println("**********************")
 
-    //PlotUtils.plot(roc, aucROC, model + s": ${"%.3f".format(aucROC)}")
+    PlotUtils.plot(roc, aucROC, model + s": ${"%.3f".format(aucROC)}")
   }
 
   def createContext: (SparkContext, SparkSession) = {
