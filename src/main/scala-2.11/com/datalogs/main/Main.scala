@@ -48,20 +48,34 @@ object Main {
     val (patients, diags, meds, labs, events) = DataLoad.loadPatientData(spark, conf.csvPath())
     println(s"Patient data load finished")
 
+    //Returns => List of (Patient_ID, Index_Date)
     val indexDates = FeatureConstruction.cobstructPatientIndexDate(spark, events, patients)
     println(s"${indexDates.count} patient index date calculation finished")
 
+    //Returns => List of {(Patient_ID, Diag_Code), Value}
     val diagnosticFeature = FeatureConstruction.constructDiagnosticFeatureTuple(spark, indexDates, diags)
     println(s"${diagnosticFeature.count} diagnostic feature construction finished")
 
+    //Returns => List of {(Patient_ID, Drug), Value}
     val medicationFeature = FeatureConstruction.constructMedicationFeatureTuple(spark, indexDates, meds)
     println(s"${medicationFeature.count} medication feature construction finished")
 
+    //Returns => List of {(Patient_ID, Lab), Value}
     val labResultFeature =  FeatureConstruction.constructLabResultFeatureTuple(spark, indexDates, labs)
     println(s"${labResultFeature.count} lab result feature construction finished")
 
+    //Returns => List of {(PATIENT-ID, EVENT-CODE), VALUE}
     val allFeature = diagnosticFeature.union(medicationFeature).union(labResultFeature)
+
     FileUtils.deleteQuietly(new File(conf.featurePath()))
+
+    //Construct Feature Vector and saves it to a file system
+    //===================== Structure ===========================================
+    // Patient-1 isDead  Event-1:Val-1 Event2:val2 Event2:val3 :::::: Eventn:valn
+    // Patient-2 isDead  Event-1:Val-1 Event2:val2 Event2:val3 :::::: Eventn:valn
+    //      ::::::::::::::::::::::::::
+    // Patient-N isDead  Event-1:Val-1 Event2:val2 Event2:val3 :::::: Eventn:valn
+    //===========================================================================
     FeatureConstruction.constructFeatureVector(sc, patients.rdd, allFeature, conf.featurePath())
     println(s"Feature construction finished")
   }

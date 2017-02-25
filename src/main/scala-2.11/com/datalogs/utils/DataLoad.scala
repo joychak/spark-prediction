@@ -53,6 +53,7 @@ object DataLoad {
 
   def loadRawData(spark: SparkSession, inputPath: String, dateFormat: SimpleDateFormat)
   : (Dataset[Patient], Dataset[PatientEvent]) = {
+
     (loadRawMortalityData(spark, inputPath, dateFormat),
       loadRawEventData(spark, inputPath, dateFormat))
   }
